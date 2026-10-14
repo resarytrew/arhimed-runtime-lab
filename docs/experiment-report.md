@@ -2,6 +2,10 @@
 
 Status: **negative for configuration 1; Stage 1 is not accepted.**
 
+Public lab: <https://resarytrew.github.io/arhimed-runtime-lab/>  
+Source commit: `bbb150e3fd566b7a47fcb65c0af40752f09de445`  
+Successful Pages workflow: <https://github.com/resarytrew/arhimed-runtime-lab/actions/runs/38596223556>
+
 This lab deliberately contains synthetic parent control strings only. The parent puts separate values in its DOM, `localStorage`, and IndexedDB. The sandbox runs as `<iframe sandbox="allow-scripts">`, without `allow-same-origin`, and receives commands only through a versioned message schema, iframe-window identity, a per-load random capability, monotonic revision, and a 16 KiB source cap.
 
 ## Tested configuration
