@@ -1,4 +1,4 @@
-import { CROSS_ORIGIN_PROTOCOL, REACTIVE_SCENE, SIMPLE_SCENE, type RuntimeCommand, type RuntimeEvent } from "./cross-origin-protocol";
+import { CROSS_ORIGIN_MAX_SOURCE_BYTES, CROSS_ORIGIN_PROTOCOL, REACTIVE_SCENE, SIMPLE_SCENE, type RuntimeCommand, type RuntimeEvent } from "./cross-origin-protocol";
 import "./style.css";
 
 const frame = document.querySelector<HTMLIFrameElement>("#runtime-frame")!;
@@ -7,6 +7,7 @@ const checks = document.querySelector<HTMLOutputElement>("#checks-output")!;
 const events = document.querySelector<HTMLElement>("#events-output")!;
 const suppliedRuntime = new URLSearchParams(location.search).get("runtime");
 const benchmarkRuns = Math.min(30, Math.max(0, Number(new URLSearchParams(location.search).get("benchmark")) || 0));
+const protocolTest = new URLSearchParams(location.search).get("protocolTest");
 
 // These synthetic values make an accidental same-origin regression observable. They are
 // never serialised into a MessageChannel command or included in the iframe URL.
@@ -91,6 +92,14 @@ if (!suppliedRuntime) {
       if (event.kind === "ready") {
         ready = true;
         window.clearTimeout(readyTimer);
+        if (protocolTest === "oversize") {
+          summary.textContent = "Sending an intentionally oversized source for the protocol-limit check.";
+          send("run", `import manimgx as m\n# ${"x".repeat(CROSS_ORIGIN_MAX_SOURCE_BYTES)}`, "simple");
+          return;
+        }
+        if (protocolTest === "stale") {
+          port.postMessage({ protocol: CROSS_ORIGIN_PROTOCOL, sessionId, revision: 0, requestId: crypto.randomUUID(), kind: "cancel" } satisfies RuntimeCommand);
+        }
         summary.textContent = "Authenticated MessageChannel connected; starting isolation probes.";
         send("probe");
         return;
