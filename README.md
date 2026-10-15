@@ -10,4 +10,4 @@ npm test
 
 The current conclusion is negative for an opaque-origin iframe: ManimGX 0.1.1 requires a Blob module Worker that cannot start in this boundary. See [the experiment report](docs/experiment-report.md) and [fixed dependencies](docs/dependencies.md).
 
-The prepared cross-origin protocol and local feasibility results are documented in [cross-origin-progress.md](docs/cross-origin-progress.md). It is not a Stage 1 acceptance result until it is deployed to a separately owned HTTPS origin.
+The prepared cross-origin protocol and local feasibility results are documented in [cross-origin-progress.md](docs/cross-origin-progress.md). The final acceptance result is published separately because its runtime must have a different HTTPS origin: [Stage 1 HTTPS-origin report](https://github.com/arhimed-runtime/arhimed-runtime.github.io/blob/main/docs/stage-1-https-origin-report.md). The opaque-origin result remains negative; it was not weakened to obtain this result.
