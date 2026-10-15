@@ -98,7 +98,7 @@ if (!suppliedRuntime) {
           return;
         }
         if (protocolTest === "stale") {
-          port.postMessage({ protocol: CROSS_ORIGIN_PROTOCOL, sessionId, revision: 0, requestId: crypto.randomUUID(), kind: "cancel" } satisfies RuntimeCommand);
+          port?.postMessage({ protocol: CROSS_ORIGIN_PROTOCOL, sessionId, revision: 0, requestId: crypto.randomUUID(), kind: "cancel" } satisfies RuntimeCommand);
         }
         summary.textContent = "Authenticated MessageChannel connected; starting isolation probes.";
         send("probe");
