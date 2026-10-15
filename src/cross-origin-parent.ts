@@ -6,6 +6,7 @@ const summary = document.querySelector<HTMLElement>("#summary")!;
 const checks = document.querySelector<HTMLOutputElement>("#checks-output")!;
 const events = document.querySelector<HTMLElement>("#events-output")!;
 const suppliedRuntime = new URLSearchParams(location.search).get("runtime");
+const benchmarkRuns = Math.min(30, Math.max(0, Number(new URLSearchParams(location.search).get("benchmark")) || 0));
 
 // These synthetic values make an accidental same-origin regression observable. They are
 // never serialised into a MessageChannel command or included in the iframe URL.
@@ -26,7 +27,8 @@ if (!suppliedRuntime) {
   let ready = false;
   let readyTimer = 0;
   let revision = 0;
-  let phase: "probe" | "simple" | "reactive" | "stopping" | "restart" | "done" = "probe";
+  let phase: "probe" | "simple" | "reactive" | "stopping" | "restart" | "benchmark" | "done" = "probe";
+  let completedBenchmarkRuns = 0;
 
   function log(event: RuntimeEvent) {
     events.textContent += `${new Date().toISOString()} ${event.kind} r${event.revision}: ${event.detail}\n`;
@@ -59,8 +61,22 @@ if (!suppliedRuntime) {
       summary.textContent = "Context stopped; running a fresh simple scene.";
       send("run", SIMPLE_SCENE, "restart");
     } else if (event.kind === "rendered" && phase === "restart") {
+      if (benchmarkRuns > 0) {
+        phase = "benchmark";
+        summary.textContent = `Collecting ${benchmarkRuns} warmed ManimGX frames.`;
+        send("run", SIMPLE_SCENE, "restart");
+        return;
+      }
       phase = "done";
       summary.textContent = "Cross-origin run, reactive scene, stop, and restart completed.";
+    } else if (event.kind === "rendered" && phase === "benchmark") {
+      completedBenchmarkRuns += 1;
+      if (completedBenchmarkRuns < benchmarkRuns) {
+        send("run", SIMPLE_SCENE, "restart");
+        return;
+      }
+      phase = "done";
+      summary.textContent = `Cross-origin run completed with ${completedBenchmarkRuns} warmed ManimGX frames.`;
     }
   }
 
